@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Reservas - Pádel Club</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Eliminar date-fns que causa problemas con exports -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script> -->
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-tennis-ball"></i>
+                <span>Pádel Club</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active" data-section="home">Inicio</a></li>
+                <li><a href="#reservas" class="nav-link" data-section="reservas">Reservas</a></li>
+                <li><a href="#canchas" class="nav-link" data-section="canchas">Canchas</a></li>
+                <li><a href="#usuarios" class="nav-link" data-section="usuarios">Usuarios</a></li>
+                <li><a href="#estadisticas" class="nav-link" data-section="estadisticas">Estadísticas</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Sección Home -->
+        <section id="home" class="section active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Bienvenido al Sistema de Reservas</h1>
+                    <p>Gestiona tus reservas de pádel de manera fácil y eficiente</p>
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <h3 id="total-usuarios">0</h3>
+                            <p>Usuarios Registrados</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar-check"></i>
+                            <h3 id="total-reservas">0</h3>
+                            <p>Reservas Totales</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-chart-line"></i>
+                            <h3 id="ingresos-totales">$0</h3>
+                            <p>Ingresos Totales</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-tennis-ball"></i>
+                            <h3 id="total-canchas">0</h3>
+                            <p>Canchas Disponibles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Reservas -->
+        <section id="reservas" class="section">
+            <div class="section-header">
+                <h2>Gestión de Reservas</h2>
+                <button class="btn btn-primary" onclick="abrirModalReserva()">
+                    <i class="fas fa-plus"></i> Nueva Reserva
+                </button>
+            </div>
+
+            <div class="filters">
+                <input type="date" id="filtro-fecha" placeholder="Filtrar por fecha">
+                <select id="filtro-estado">
+                    <option value="">Todos los estados</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="confirmada">Confirmada</option>
+                    <option value="completada">Completada</option>
+                    <option value="cancelada">Cancelada</option>
+                </select>
+                <button class="btn btn-secondary" onclick="filtrarReservas()">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                <button class="btn btn-outline" onclick="limpiarFiltros()">
+                    <i class="fas fa-times"></i> Limpiar
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table id="tabla-reservas">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Cancha</th>
+                            <th>Fecha</th>
+                            <th>Horario</th>
+                            <th>Estado</th>
+                            <th>Precio</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div id="pagination-reservas"></div>
+            </div>
+        </section>
+
+        <!-- Sección Canchas -->
+        <section id="canchas" class="section">
+            <div class="section-header">
+                <h2>Canchas Disponibles</h2>
+            </div>
+
+            <div class="cards-grid" id="grid-canchas">
+                <!-- Las canchas se cargarán dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Sección Usuarios -->
+        <section id="usuarios" class="section">
+            <div class="section-header">
+                <h2>Usuarios Registrados</h2>
+                <button class="btn btn-primary" onclick="abrirModalUsuario()">
+                    <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table id="tabla-usuarios">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Nivel</th>
+                            <th>Fecha Registro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                <div id="pagination-usuarios"></div>
+            </div>
+        </section>
+
+        <!-- Sección Estadísticas -->
+        <section id="estadisticas" class="section">
+            <div class="section-header">
+                <h2>Análisis de Datos y Estadísticas</h2>
+                <button class="btn btn-primary" onclick="cargarTodosLosGraficos()">
+                    <i class="fas fa-chart-bar"></i> Actualizar Gráficos
+                </button>
+            </div>
+
+            <div class="charts-container">
+                <!-- Gráfico de Barras -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Popularidad de Canchas</h3>
+                        <p>Comparación entre categorías - Gráfico de Barras</p>
+                    </div>
+                    <div class="chart-content">
+                        <div id="grafico-barras-container">
+                            <canvas id="grafico-barras" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-interpretation" id="interpretacion-barras">
+                            <!-- La interpretación se cargará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Líneas -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Evolución Temporal de Reservas</h3>
+                        <p>Evolución temporal - Gráfico de Líneas</p>
+                    </div>
+                    <div class="chart-content">
+                        <div id="grafico-lineas-container">
+                            <canvas id="grafico-lineas" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-interpretation" id="interpretacion-lineas">
+                            <!-- La interpretación se cargará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Torta -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Distribución de Horarios</h3>
+                        <p>Proporciones y porcentajes - Gráfico de Torta</p>
+                    </div>
+                    <div class="chart-content">
+                        <div id="grafico-torta-container">
+                            <canvas id="grafico-torta" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-interpretation" id="interpretacion-torta">
+                            <!-- La interpretación se cargará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Dispersión -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Correlación Precio vs Demanda</h3>
+                        <p>Correlación entre variables - Gráfico de Dispersión</p>
+                    </div>
+                    <div class="chart-content">
+                        <div id="grafico-dispersion-container">
+                            <canvas id="grafico-dispersion" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-interpretation" id="interpretacion-dispersion">
+                            <!-- La interpretación se cargará dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal Nueva Reserva -->
+    <div id="modal-reserva" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Nueva Reserva</h3>
+                <span class="close" onclick="cerrarModal('modal-reserva')">&times;</span>
+            </div>
+            <form id="form-reserva">
+                <div class="form-group">
+                    <label for="select-usuario">Usuario:</label>
+                    <select id="select-usuario" required>
+                        <option value="">Seleccionar usuario</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="select-cancha">Cancha:</label>
+                    <select id="select-cancha" required onchange="cargarHorariosDisponibles()">
+                        <option value="">Seleccionar cancha</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fecha-reserva">Fecha:</label>
+                    <input type="date" id="fecha-reserva" required onchange="cargarHorariosDisponibles()">
+                </div>
+                <div class="form-group">
+                    <label for="select-horario">Horario:</label>
+                    <select id="select-horario" required onchange="calcularPrecio()">
+                        <option value="">Seleccionar horario</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="precio-total">Precio Total:</label>
+                    <input type="number" id="precio-total" step="0.01" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="observaciones">Observaciones:</label>
+                    <textarea id="observaciones" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal('modal-reserva')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Reserva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Usuario -->
+    <div id="modal-usuario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nuevo Usuario</h2>
+                <span class="close" onclick="cerrarModal('modal-usuario')">&times;</span>
+            </div>
+            <form id="form-usuario">
+                <div class="form-group">
+                    <label for="nombre-usuario">Nombre:</label>
+                    <input type="text" id="nombre-usuario" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido-usuario">Apellido:</label>
+                    <input type="text" id="apellido-usuario" required>
+                </div>
+                <div class="form-group">
+                    <label for="email-usuario">Email:</label>
+                    <input type="email" id="email-usuario" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono-usuario">Teléfono:</label>
+                    <input type="tel" id="telefono-usuario">
+                </div>
+                <div class="form-group">
+                    <label for="nivel-usuario">Nivel de Juego:</label>
+                    <select id="nivel-usuario">
+                        <option value="principiante">Principiante</option>
+                        <option value="intermedio">Intermedio</option>
+                        <option value="avanzado">Avanzado</option>
+                        <option value="profesional">Profesional</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal('modal-usuario')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Crear Usuario</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Cargando...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Script inline para asegurar funciones globales -->
+    <script>
+        // Función de respaldo para cargar horarios disponibles
+        async function cargarHorariosDisponibles() {
+            console.log('🔄 Función inline - Iniciando cargarHorariosDisponibles...');
+            
+            const selectCancha = document.getElementById('select-cancha');
+            const fechaInput = document.getElementById('fecha-reserva');
+            const selectHorario = document.getElementById('select-horario');
+            
+            if (!selectCancha || !fechaInput || !selectHorario) {
+                console.error('❌ Elementos no encontrados');
+                return;
+            }
+            
+            if (!selectCancha.value || !fechaInput.value) {
+                console.log('⚠️ Valores faltantes - reseteando horario');
+                selectHorario.innerHTML = '<option value="">Seleccionar horario</option>';
+                return;
+            }
+            
+            try {
+                console.log('🌐 Llamando API directamente...');
+                const url = `http://localhost:5000/api/horarios/disponibles?cancha=${selectCancha.value}&fecha=${fechaInput.value}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                console.log('📥 Datos recibidos:', data);
+                
+                if (data.success && data.data) {
+                    selectHorario.innerHTML = '<option value="">Seleccionar horario</option>';
+                    
+                    data.data.forEach(horario => {
+                        const option = document.createElement('option');
+                        option.value = horario.id_horario;
+                        option.textContent = `${horario.hora_inicio} - ${horario.hora_fin}`;
+                        selectHorario.appendChild(option);
+                    });
+                    
+                    console.log('✅ Horarios cargados:', data.data.length);
+                } else {
+                    console.error('❌ Error en respuesta:', data.message);
+                    selectHorario.innerHTML = '<option value="">Error cargando horarios</option>';
+                }
+                
+            } catch (error) {
+                console.error('💥 Error en fetch:', error);
+                selectHorario.innerHTML = '<option value="">Error de conexión</option>';
+            }
+        }
+        
+        // Función para calcular precio
+        function calcularPrecio() {
+            console.log('💰 Calculando precio...');
+            const selectCancha = document.getElementById('select-cancha');
+            const precioInput = document.getElementById('precio-total');
+            
+            if (selectCancha && selectCancha.value && precioInput) {
+                const selectedOption = selectCancha.options[selectCancha.selectedIndex];
+                const precio = selectedOption.getAttribute('data-precio');
+                if (precio) {
+                    precioInput.value = precio;
+                    console.log('✅ Precio calculado:', precio);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
