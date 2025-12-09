@@ -356,6 +356,4 @@ npm test
 ---
 **Desarrollado con ❤️ para la comunidad de pádel**
 
-#   R e s e r v a - C a n c h a - d e - p a d e l 
- 
- 
+#
